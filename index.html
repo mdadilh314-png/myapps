@@ -3,1439 +3,1187 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ADIL — Apps Developer & Scraping Expert</title>
-  <meta name="description" content="Elite apps developer and data scraping expert. Premium custom software, AI applications, and automation systems." />
+  <title>Adil — Apps Developer & Scrapping Expert</title>
 
-  <!-- Google Fonts -->
+  <!-- Google Fonts: Syne + DM Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
 
-  <!-- FontAwesome CDN -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- FontAwesome CDN — Required for all brand + social icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <style>
     /* ============================================================
-       ROOT VARIABLES & RESET
+       CSS CUSTOM PROPERTIES & RESET
     ============================================================ */
     :root {
-      --cyan:    #00f3ff;
-      --pink:    #ff007f;
-      --purple:  #7000ff;
-      --dark:    #04010f;
-      --darker:  #020009;
-      --glass-bg:       rgba(255,255,255,0.05);
-      --glass-border:   rgba(255,255,255,0.12);
-      --glass-shine:    rgba(255,255,255,0.07);
-      --blur:    16px;
+      --cyan:   #00f3ff;
+      --pink:   #ff007f;
+      --purple: #7000ff;
+      --bg:     #050510;
+      --glass-bg: rgba(255,255,255,0.055);
+      --glass-border: rgba(255,255,255,0.13);
+      --glass-highlight: rgba(255,255,255,0.08);
+      --text-primary: #f0f4ff;
+      --text-muted: rgba(200,210,255,0.6);
       --font-display: 'Syne', sans-serif;
-      --font-mono:    'Space Mono', monospace;
-      --font-body:    'DM Sans', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --radius: 20px;
+      --blur: 18px;
+      --transition: 0.38s cubic-bezier(.22,.68,0,1.2);
     }
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html {
-      scroll-behavior: smooth;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-
+    html { scroll-behavior: smooth; font-size: 16px; }
     body {
-      background: var(--darker);
-      color: #e8e0ff;
+      background: var(--bg);
+      color: var(--text-primary);
       font-family: var(--font-body);
       overflow-x: hidden;
-      position: relative;
+      -webkit-font-smoothing: antialiased;
     }
-
     a { color: inherit; text-decoration: none; }
-    button { cursor: pointer; border: none; background: none; font-family: inherit; }
 
     /* ============================================================
-       ANIMATED BACKGROUND ORBS
+       AMBIENT BACKGROUND ORBS
     ============================================================ */
-    .bg-canvas {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      overflow: hidden;
+    .bg-orbs {
+      position: fixed; inset: 0; z-index: 0;
+      pointer-events: none; overflow: hidden;
     }
-
     .orb {
       position: absolute;
       border-radius: 50%;
-      filter: blur(90px);
-      opacity: 0.35;
+      filter: blur(120px);
+      opacity: 0.28;
       will-change: transform;
-      animation: orb-drift 18s ease-in-out infinite alternate;
+      animation: orbFloat 18s ease-in-out infinite alternate;
     }
+    .orb-1 { width: 700px; height: 700px; background: var(--purple); top: -180px; left: -180px; animation-delay: 0s; }
+    .orb-2 { width: 600px; height: 600px; background: var(--cyan); top: 40%; right: -200px; animation-delay: -6s; }
+    .orb-3 { width: 500px; height: 500px; background: var(--pink); bottom: -150px; left: 30%; animation-delay: -12s; }
 
-    .orb-1 {
-      width: 700px; height: 700px;
-      background: radial-gradient(circle, var(--purple), transparent 70%);
-      top: -200px; left: -200px;
-      animation-duration: 20s;
-    }
-    .orb-2 {
-      width: 600px; height: 600px;
-      background: radial-gradient(circle, var(--cyan), transparent 70%);
-      top: 30%; right: -150px;
-      animation-duration: 15s;
-      animation-delay: -5s;
-    }
-    .orb-3 {
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, var(--pink), transparent 70%);
-      bottom: 10%; left: 20%;
-      animation-duration: 22s;
-      animation-delay: -10s;
-    }
-
-    @keyframes orb-drift {
-      0%   { transform: translate3d(0,0,0) scale(1); }
-      50%  { transform: translate3d(60px,40px,0) scale(1.08); }
-      100% { transform: translate3d(-40px,70px,0) scale(0.95); }
+    @keyframes orbFloat {
+      from { transform: translate3d(0,0,0) scale(1); }
+      to   { transform: translate3d(40px, 60px, 0) scale(1.08); }
     }
 
     /* ============================================================
-       GLASS MIXIN (utility class)
+       GLASS UTILITY
     ============================================================ */
     .glass {
       background: var(--glass-bg);
       backdrop-filter: blur(var(--blur));
       -webkit-backdrop-filter: blur(var(--blur));
       border: 1px solid var(--glass-border);
-      box-shadow:
-        0 0 0 0.5px rgba(255,255,255,0.05) inset,
-        0 8px 32px rgba(0,0,0,0.4),
-        0 0 80px rgba(112,0,255,0.08);
-    }
-
-    /* ============================================================
-       LAYOUT WRAPPER
-    ============================================================ */
-    .wrapper {
+      border-radius: var(--radius);
       position: relative;
-      z-index: 1;
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 0 24px;
+      overflow: hidden;
+    }
+    .glass::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--glass-highlight) 0%, transparent 60%);
+      pointer-events: none;
+      border-radius: inherit;
     }
 
     /* ============================================================
        NAV
     ============================================================ */
     nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      padding: 18px 0;
-      background: rgba(4,1,15,0.6);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      transition: background 0.3s;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      padding: 0 5vw;
+      height: 68px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(5,5,16,0.55);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      will-change: transform;
     }
-
-    nav .nav-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
     .nav-logo {
       font-family: var(--font-display);
       font-weight: 800;
-      font-size: 1.3rem;
-      letter-spacing: 0.04em;
-      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      font-size: 1.35rem;
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, var(--cyan), var(--purple));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-clip: text;
     }
-
-    .nav-links {
-      display: flex;
-      gap: 32px;
-      list-style: none;
-    }
-
+    .nav-links { display: flex; gap: 2.2rem; align-items: center; }
     .nav-links a {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      letter-spacing: 0.1em;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: rgba(232,224,255,0.6);
-      transition: color 0.2s;
+      color: var(--text-muted);
+      transition: color 0.25s;
     }
-
     .nav-links a:hover { color: var(--cyan); }
-
     .nav-cta {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 10px 22px;
-      border-radius: 100px;
-      background: linear-gradient(135deg, var(--cyan), var(--purple));
-      color: #fff;
-      font-weight: 700;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 0 24px rgba(0,243,255,0.3);
+      padding: 9px 22px;
+      border-radius: 50px;
+      border: 1px solid var(--cyan);
+      color: var(--cyan) !important;
+      font-weight: 600 !important;
+      transition: background 0.25s, color 0.25s !important;
     }
-
-    .nav-cta:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 40px rgba(0,243,255,0.5);
-    }
+    .nav-cta:hover { background: var(--cyan); color: #050510 !important; }
 
     /* ============================================================
-       HERO
+       HERO SECTION
     ============================================================ */
-    .hero {
+    #hero {
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      padding-top: 100px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 120px 5vw 80px;
+      position: relative; z-index: 1;
     }
-
-    .hero-content {
-      max-width: 900px;
-    }
-
     .hero-eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 0.8rem;
+      font-weight: 500;
       letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--cyan);
-      margin-bottom: 28px;
-      padding: 8px 18px;
-      border-radius: 100px;
-      border: 1px solid rgba(0,243,255,0.25);
-      background: rgba(0,243,255,0.06);
+      border: 1px solid rgba(0,243,255,0.3);
+      padding: 7px 18px;
+      border-radius: 50px;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(8px);
+      background: rgba(0,243,255,0.07);
+      animation: fadeUp 0.8s ease both;
     }
+    .hero-eyebrow span { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); animation: pulse 2s infinite; }
 
-    .hero-eyebrow .dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--cyan);
-      animation: pulse-dot 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse-dot {
-      0%,100% { opacity: 1; transform: scale(1); }
-      50%      { opacity: 0.4; transform: scale(0.6); }
+    @keyframes pulse {
+      0%,100% { opacity: 1; } 50% { opacity: 0.3; }
     }
 
     .hero-title {
       font-family: var(--font-display);
       font-weight: 800;
-      font-size: clamp(3rem, 8vw, 7.5rem);
-      line-height: 0.92;
-      letter-spacing: -0.02em;
+      font-size: clamp(2.8rem, 8vw, 7.5rem);
+      line-height: 0.95;
+      letter-spacing: -0.03em;
       text-transform: uppercase;
-      margin-bottom: 32px;
+      max-width: 1000px;
+      animation: fadeUp 0.9s 0.15s ease both;
     }
-
-    .hero-title .line-1 { display: block; color: #fff; }
-    .hero-title .line-2 {
+    .hero-title .line-cyan {
+      background: linear-gradient(90deg, var(--cyan) 0%, #00aaff 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       display: block;
-      background: linear-gradient(135deg, var(--cyan) 0%, var(--purple) 50%, var(--pink) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
     }
-    .hero-title .line-3 { display: block; color: rgba(255,255,255,0.85); }
-
-    .hero-sub {
-      font-size: 1.15rem;
+    .hero-title .line-pink {
+      background: linear-gradient(90deg, var(--pink) 0%, var(--purple) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      display: block;
+    }
+    .hero-subtitle {
+      margin-top: 1.8rem;
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--text-muted);
+      max-width: 600px;
       line-height: 1.7;
-      color: rgba(232,224,255,0.6);
-      max-width: 560px;
-      margin-bottom: 48px;
+      animation: fadeUp 0.9s 0.3s ease both;
     }
-
     .hero-actions {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 2.5rem;
+      animation: fadeUp 0.9s 0.45s ease both;
     }
-
     .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 16px 36px;
-      border-radius: 100px;
-      background: linear-gradient(135deg, var(--cyan), var(--purple));
-      color: #fff;
+      padding: 15px 36px;
+      border-radius: 50px;
       font-family: var(--font-display);
       font-weight: 700;
-      font-size: 0.95rem;
-      letter-spacing: 0.04em;
-      box-shadow: 0 0 40px rgba(0,243,255,0.3);
-      transition: transform 0.2s, box-shadow 0.2s;
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: transform var(--transition), box-shadow var(--transition);
       will-change: transform;
+      box-shadow: 0 0 30px rgba(0,243,255,0.3);
     }
-
     .btn-primary:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 0 60px rgba(0,243,255,0.5);
+      transform: translate3d(0,-3px,0) scale(1.04);
+      box-shadow: 0 0 50px rgba(0,243,255,0.5);
     }
-
-    .btn-ghost {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 15px 34px;
-      border-radius: 100px;
-      border: 1px solid var(--glass-border);
-      background: var(--glass-bg);
-      backdrop-filter: blur(12px);
-      color: rgba(255,255,255,0.8);
+    .btn-secondary {
+      padding: 15px 36px;
+      border-radius: 50px;
       font-family: var(--font-display);
-      font-weight: 600;
-      font-size: 0.95rem;
-      transition: border-color 0.2s, background 0.2s, transform 0.2s;
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--glass-border);
+      cursor: pointer;
+      transition: transform var(--transition), border-color var(--transition), background var(--transition);
+      will-change: transform;
+      backdrop-filter: blur(8px);
+    }
+    .btn-secondary:hover {
+      transform: translate3d(0,-3px,0);
+      border-color: var(--pink);
+      background: rgba(255,0,127,0.1);
+    }
+    .scroll-hint {
+      margin-top: 4rem;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      animation: fadeUp 1s 0.7s ease both;
+    }
+    .scroll-hint .arrow {
+      width: 1px; height: 40px;
+      background: linear-gradient(to bottom, var(--cyan), transparent);
+      animation: scrollArrow 2s ease-in-out infinite;
+    }
+    @keyframes scrollArrow {
+      0%,100% { opacity: 0.5; transform: scaleY(1); }
+      50% { opacity: 1; transform: scaleY(1.1); }
     }
 
-    .btn-ghost:hover {
-      border-color: var(--cyan);
-      background: rgba(0,243,255,0.08);
-      transform: translateY(-3px);
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translate3d(0, 30px, 0); }
+      to   { opacity: 1; transform: translate3d(0, 0, 0); }
     }
 
     /* ============================================================
        STATS SECTION
     ============================================================ */
-    .stats-section {
-      padding: 32px 0 80px;
+    #stats {
+      position: relative; z-index: 1;
+      padding: 0 5vw 6rem;
     }
-
-    .stats-glass {
-      border-radius: 28px;
-      padding: 48px 56px;
+    .stats-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0;
-      position: relative;
-      overflow: hidden;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      max-width: 1100px;
+      margin: 0 auto;
     }
-
-    .stats-glass::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(0,243,255,0.05), rgba(112,0,255,0.08), rgba(255,0,127,0.05));
-      pointer-events: none;
-    }
-
-    .stat-item {
+    .stat-card {
+      padding: 2.5rem 2rem;
       text-align: center;
-      padding: 24px;
-      position: relative;
+      transition: transform var(--transition), box-shadow var(--transition);
+      will-change: transform;
     }
-
-    .stat-item:not(:last-child)::after {
-      content: '';
-      position: absolute;
-      right: 0; top: 20%; bottom: 20%;
-      width: 1px;
-      background: linear-gradient(to bottom, transparent, var(--glass-border), transparent);
+    .stat-card:hover {
+      transform: translate3d(0,-6px,0);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 30px rgba(0,243,255,0.12);
     }
-
+    .stat-icon {
+      font-size: 2rem; margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
     .stat-number {
       font-family: var(--font-display);
       font-weight: 800;
-      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-size: clamp(2rem, 4vw, 3rem);
+      background: linear-gradient(90deg, var(--cyan), var(--pink));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       line-height: 1;
-      margin-bottom: 10px;
     }
-
-    .stat-number.cyan  { color: var(--cyan); }
-    .stat-number.pink  { color: var(--pink); }
-    .stat-number.purple{ color: #a855f7; }
-
     .stat-label {
-      font-family: var(--font-mono);
-      font-size: 0.72rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: rgba(232,224,255,0.5);
+      margin-top: 0.6rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
     }
 
     /* ============================================================
-       MARQUEE
+       TECH MARQUEE
     ============================================================ */
-    .marquee-section {
-      padding: 0 0 90px;
+    #marquee {
+      position: relative; z-index: 1;
+      padding: 0 0 6rem;
       overflow: hidden;
     }
-
     .marquee-label {
       text-align: center;
-      font-family: var(--font-mono);
-      font-size: 0.68rem;
-      letter-spacing: 0.22em;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: rgba(232,224,255,0.3);
-      margin-bottom: 28px;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
     }
-
+    .marquee-track-wrapper {
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 10%, black 90%, transparent 100%);
+      mask-image: linear-gradient(90deg, transparent 0%, black 10%, black 90%, transparent 100%);
+    }
     .marquee-track {
       display: flex;
       gap: 0;
-      overflow: hidden;
-      mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-    }
-
-    .marquee-strip {
-      display: flex;
-      align-items: center;
-      gap: 52px;
-      padding-right: 52px;
-      animation: marquee-run 22s linear infinite;
+      width: max-content;
+      animation: marqueeScroll 28s linear infinite;
       will-change: transform;
-      flex-shrink: 0;
     }
-
-    @keyframes marquee-run {
-      0%   { transform: translate3d(0,0,0); }
-      100% { transform: translate3d(-50%,0,0); }
-    }
-
-    .tech-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 24px;
-      border-radius: 100px;
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(10px);
-      white-space: nowrap;
+    .marquee-track:hover { animation-play-state: paused; }
+    .marquee-item {
+      display: inline-flex; align-items: center; gap: 12px;
+      padding: 0 2.5rem;
       font-family: var(--font-display);
-      font-weight: 600;
-      font-size: 0.85rem;
-      color: rgba(232,224,255,0.8);
-      transition: border-color 0.2s, color 0.2s;
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: 0.03em;
+      color: rgba(255,255,255,0.5);
+      white-space: nowrap;
+      transition: color 0.25s;
     }
-
-    .tech-badge i { font-size: 1.1rem; }
-    .tech-badge .fa-python     { color: #3776ab; }
-    .tech-badge .fa-js         { color: #f7df1e; }
-    .tech-badge .fa-css3-alt   { color: #1572b6; }
-    .tech-badge .fa-html5      { color: #e34f26; }
-    .tech-badge .fa-linux      { color: #fcc624; }
-    .tech-badge .fa-plug       { color: var(--cyan); }
-    .tech-badge .fa-database   { color: #a855f7; }
-    .tech-badge .fa-robot      { color: var(--pink); }
+    .marquee-item i { font-size: 1.4rem; }
+    .marquee-item.py i { color: #3572A5; }
+    .marquee-item.js i { color: #f7df1e; }
+    .marquee-item.css i { color: #264de4; }
+    .marquee-item.html i { color: #e34c26; }
+    .marquee-item.linux i { color: #fcc624; }
+    .marquee-item.api i { color: var(--cyan); }
+    .marquee-dot {
+      color: var(--glass-border);
+      font-size: 1.5rem;
+      padding: 0 0.5rem;
+      align-self: center;
+    }
+    @keyframes marqueeScroll {
+      from { transform: translate3d(0,0,0); }
+      to   { transform: translate3d(-50%,0,0); }
+    }
 
     /* ============================================================
-       SECTION HEADINGS
+       SECTION HEADER
     ============================================================ */
-    .section-head {
+    .section-header {
       text-align: center;
-      margin-bottom: 64px;
+      margin-bottom: 4rem;
     }
-
     .section-eyebrow {
       display: inline-block;
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: var(--cyan);
-      margin-bottom: 18px;
-      padding: 6px 16px;
-      border-radius: 100px;
-      border: 1px solid rgba(0,243,255,0.2);
-      background: rgba(0,243,255,0.05);
+      color: var(--pink);
+      margin-bottom: 1rem;
     }
-
     .section-title {
       font-family: var(--font-display);
       font-weight: 800;
-      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      letter-spacing: -0.03em;
       line-height: 1.05;
-      letter-spacing: -0.02em;
-      color: #fff;
-      margin-bottom: 18px;
-    }
-
-    .section-sub {
-      font-size: 1rem;
-      color: rgba(232,224,255,0.5);
-      max-width: 520px;
-      margin: 0 auto;
-      line-height: 1.65;
     }
 
     /* ============================================================
        APPS GRID
     ============================================================ */
-    .apps-section { padding: 0 0 100px; }
-
+    #apps {
+      position: relative; z-index: 1;
+      padding: 0 5vw 6rem;
+    }
     .apps-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 24px;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
     }
-
     .app-card {
-      border-radius: 24px;
-      padding: 32px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.3s cubic-bezier(0.23,1,0.32,1), box-shadow 0.3s;
+      padding: 2rem;
+      transition: transform var(--transition), box-shadow var(--transition);
       will-change: transform;
-      cursor: default;
+      display: flex; flex-direction: column; gap: 1rem;
     }
-
-    /* Glow border on hover */
-    .app-card::before {
-      content: '';
-      position: absolute;
-      inset: -1px;
-      border-radius: 24px;
-      background: linear-gradient(135deg, var(--cyan), var(--purple), var(--pink));
-      opacity: 0;
-      transition: opacity 0.35s;
-      z-index: -1;
-    }
-
-    .app-card:hover::before { opacity: 1; }
-
     .app-card:hover {
-      transform: translateY(-6px) scale(1.012);
-      box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 40px rgba(112,0,255,0.2);
+      transform: translate3d(0,-8px,0);
+      box-shadow:
+        0 24px 80px rgba(0,0,0,0.5),
+        0 0 0 1px rgba(0,243,255,0.2),
+        inset 0 1px 0 rgba(255,255,255,0.1);
     }
-
-    /* Specular shimmer */
-    .app-card::after {
-      content: '';
-      position: absolute;
-      top: 0; left: -60%;
-      width: 40%; height: 100%;
-      background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.05) 50%, transparent 60%);
-      transition: left 0.5s ease;
+    .app-card-header {
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
     }
-
-    .app-card:hover::after { left: 120%; }
-
-    .app-icon-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    .app-emoji { font-size: 2.2rem; line-height: 1; }
+    .app-tech-badges { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .tech-badge {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--glass-border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem;
+      transition: transform 0.2s, background 0.2s;
     }
-
-    .app-emoji {
-      font-size: 2.2rem;
-      line-height: 1;
-    }
-
-    .app-tech-icons {
-      display: flex;
-      gap: 10px;
-      font-size: 1.1rem;
-      color: rgba(232,224,255,0.4);
-    }
-
-    .app-tech-icons i { transition: color 0.2s; }
-
+    .tech-badge:hover { transform: scale(1.2); background: rgba(255,255,255,0.14); }
     .app-name {
       font-family: var(--font-display);
       font-weight: 800;
       font-size: 1.15rem;
-      letter-spacing: 0.01em;
-      color: #fff;
-      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
     }
-
     .app-desc {
-      font-size: 0.875rem;
+      font-size: 0.83rem;
       line-height: 1.65;
-      color: rgba(232,224,255,0.55);
-      flex-grow: 1;
-    }
-
-    .app-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 4px;
-    }
-
-    .btn-metrics, .btn-access {
+      color: var(--text-muted);
       flex: 1;
-      padding: 11px 14px;
-      border-radius: 100px;
-      font-family: var(--font-mono);
-      font-size: 0.68rem;
+    }
+    .app-glow-bar {
+      height: 2px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--cyan), var(--purple), var(--pink));
+      opacity: 0.5;
+    }
+    .app-actions {
+      display: flex; gap: 10px;
+    }
+    .app-btn {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-family: var(--font-display);
       font-weight: 700;
-      letter-spacing: 0.08em;
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
       text-align: center;
-      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+      will-change: transform;
+      border: none;
     }
-
-    .btn-metrics {
-      border: 1px solid rgba(0,243,255,0.35);
-      background: rgba(0,243,255,0.06);
-      color: var(--cyan);
+    .app-btn-metrics {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
     }
-
-    .btn-metrics:hover {
-      background: rgba(0,243,255,0.15);
-      box-shadow: 0 0 20px rgba(0,243,255,0.25);
-      transform: translateY(-2px);
+    .app-btn-metrics:hover {
+      background: rgba(255,255,255,0.13);
+      color: var(--text-primary);
+      transform: scale(1.03);
     }
-
-    .btn-access {
-      background: linear-gradient(135deg, var(--pink), var(--purple));
+    .app-btn-access {
+      background: linear-gradient(135deg, var(--cyan) 0%, var(--purple) 100%);
       color: #fff;
-      box-shadow: 0 0 20px rgba(255,0,127,0.2);
+      box-shadow: 0 4px 20px rgba(0,243,255,0.25);
+    }
+    .app-btn-access:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 32px rgba(0,243,255,0.5);
     }
 
-    .btn-access:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 32px rgba(255,0,127,0.4);
+    /* Metrics modal */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 2000;
+      background: rgba(5,5,16,0.85);
+      backdrop-filter: blur(12px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
     }
+    .modal-overlay.active { opacity: 1; pointer-events: all; }
+    .modal-box {
+      max-width: 480px; width: 90%;
+      padding: 2.5rem;
+      transform: scale(0.92) translateY(20px);
+      transition: transform 0.35s cubic-bezier(.22,.68,0,1.2);
+    }
+    .modal-overlay.active .modal-box {
+      transform: scale(1) translateY(0);
+    }
+    .modal-close {
+      position: absolute; top: 1rem; right: 1rem;
+      background: rgba(255,255,255,0.08);
+      border: none; color: var(--text-muted);
+      width: 32px; height: 32px; border-radius: 50%;
+      cursor: pointer; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, color 0.2s;
+    }
+    .modal-close:hover { background: rgba(255,0,127,0.2); color: var(--pink); }
+    .modal-title {
+      font-family: var(--font-display);
+      font-weight: 800; font-size: 1.4rem;
+      margin-bottom: 1.5rem;
+    }
+    .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .metric-item {
+      padding: 1rem;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--glass-border);
+      text-align: center;
+    }
+    .metric-val {
+      font-family: var(--font-display);
+      font-weight: 800; font-size: 1.4rem;
+      background: linear-gradient(90deg, var(--cyan), var(--pink));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .metric-lbl { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
 
     /* ============================================================
-       INSTAGRAM DM BANNER
+       INSTAGRAM NOTICE BANNER
     ============================================================ */
+    #ig-notice {
+      position: relative; z-index: 1;
+      padding: 0 5vw 6rem;
+    }
     .ig-banner {
-      margin: 0 0 100px;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 3rem 2.5rem;
+      text-align: center;
+      border: 1px solid rgba(255,0,127,0.35);
+      background: rgba(255,0,127,0.07);
       border-radius: 24px;
-      padding: 40px 48px;
-      display: flex;
-      align-items: center;
-      gap: 28px;
-      position: relative;
-      overflow: hidden;
     }
-
-    .ig-banner::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,0,127,0.12), rgba(112,0,255,0.1), rgba(0,243,255,0.06));
-      pointer-events: none;
-    }
-
-    .ig-banner-icon {
-      font-size: 3rem;
-      background: linear-gradient(135deg, #f58529, #dd2a7b, #8134af);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      flex-shrink: 0;
-    }
-
-    .ig-banner-text h3 {
+    .ig-banner-title {
       font-family: var(--font-display);
       font-weight: 800;
-      font-size: 1.3rem;
-      color: #fff;
-      margin-bottom: 8px;
+      font-size: clamp(1.2rem, 3vw, 1.8rem);
+      line-height: 1.4;
+      color: var(--text-primary);
     }
-
-    .ig-banner-text p {
-      font-size: 0.92rem;
-      line-height: 1.6;
-      color: rgba(232,224,255,0.65);
-    }
-
-    .ig-banner-cta {
-      margin-left: auto;
-      flex-shrink: 0;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 28px;
-      border-radius: 100px;
-      background: linear-gradient(135deg, #f58529, #dd2a7b, #8134af);
-      color: #fff;
+    .ig-banner-title span { color: var(--pink); }
+    .ig-cta-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      margin-top: 2rem;
+      padding: 16px 38px;
+      border-radius: 50px;
       font-family: var(--font-display);
-      font-weight: 700;
+      font-weight: 800;
       font-size: 0.9rem;
-      box-shadow: 0 0 32px rgba(221,42,123,0.4);
-      transition: transform 0.2s, box-shadow 0.2s;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      color: #fff;
+      cursor: pointer;
+      border: none;
+      transition: transform var(--transition), box-shadow var(--transition);
+      will-change: transform;
+      box-shadow: 0 0 40px rgba(255,0,127,0.3);
     }
-
-    .ig-banner-cta:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 0 52px rgba(221,42,123,0.6);
+    .ig-cta-btn:hover {
+      transform: translate3d(0,-4px,0);
+      box-shadow: 0 0 60px rgba(255,0,127,0.55);
     }
-
-    /* ============================================================
-       SOCIAL SECTION
-    ============================================================ */
-  .social-section {
-      padding: 0 0 100px;
-    }
-
-    .social-grid {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-
-    .social-card {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      padding: 16px 28px;
-      border-radius: 100px;
-      border: 1px solid var(--glass-border);
-      background: var(--glass-bg);
-      backdrop-filter: blur(12px);
-      font-family: var(--font-display);
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: rgba(232,224,255,0.75);
-      transition: transform 0.25s, border-color 0.25s, color 0.25s, box-shadow 0.25s;
-    }
-
-    .social-card i { font-size: 1.2rem; }
-    .social-card:hover { transform: translateY(-4px); }
-
-    .social-card.whatsapp:hover  { border-color: #25d366; color: #25d366; box-shadow: 0 0 28px rgba(37,211,102,0.25); }
-    .social-card.instagram:hover { border-color: #e1306c; color: #e1306c; box-shadow: 0 0 28px rgba(225,48,108,0.25); }
-    .social-card.telegram:hover  { border-color: #0088cc; color: #0088cc; box-shadow: 0 0 28px rgba(0,136,204,0.25); }
-    .social-card.youtube:hover   { border-color: #ff0000; color: #ff0000; box-shadow: 0 0 28px rgba(255,0,0,0.25); }
-    .social-card.twitter:hover   { border-color: #1da1f2; color: #1da1f2; box-shadow: 0 0 28px rgba(29,161,242,0.25); }
-    .social-card.email:hover     { border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 28px rgba(0,243,255,0.25); }
 
     /* ============================================================
        FOOTER
     ============================================================ */
     footer {
-      border-top: 1px solid var(--glass-border);
-      padding: 48px 0 36px;
-      text-align: center;
+      position: relative; z-index: 1;
+      padding: 5rem 5vw 3rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
     }
-
-    .footer-logo {
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 4rem;
+      max-width: 1100px;
+      margin: 0 auto 4rem;
+    }
+    .footer-brand-name {
       font-family: var(--font-display);
       font-weight: 800;
-      font-size: 1.5rem;
-      letter-spacing: 0.05em;
-      background: linear-gradient(135deg, var(--cyan), var(--purple), var(--pink));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 14px;
+      font-size: 2rem;
+      background: linear-gradient(90deg, var(--cyan), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
     }
-
-    .footer-sub {
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: rgba(232,224,255,0.35);
-      margin-bottom: 28px;
+    .footer-brand-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      max-width: 300px;
     }
-
-    .footer-links {
-      display: flex;
-      justify-content: center;
-      gap: 28px;
-      flex-wrap: wrap;
-      margin-bottom: 28px;
+    .footer-social {
+      display: flex; gap: 12px; margin-top: 1.5rem;
     }
-
-    .footer-links a {
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: rgba(232,224,255,0.4);
-      transition: color 0.2s;
+    .social-btn {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--glass-border);
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s, color 0.2s;
+      color: var(--text-muted);
     }
-
-    .footer-links a:hover { color: var(--cyan); }
-
-    .footer-copy {
-      font-size: 0.78rem;
-      color: rgba(232,224,255,0.2);
-    }
-
-    /* ============================================================
-       TERMS MODAL
-    ============================================================ */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 200;
-      background: rgba(2,0,9,0.75);
-      backdrop-filter: blur(8px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.35s;
-    }
-
-    .modal-overlay.open {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    .modal-box {
-      border-radius: 28px;
-      padding: 48px 44px;
-      max-width: 560px;
-      width: 100%;
-      position: relative;
-      transform: translateY(40px) scale(0.97);
-      transition: transform 0.35s cubic-bezier(0.23,1,0.32,1);
-    }
-
-    .modal-overlay.open .modal-box {
-      transform: translateY(0) scale(1);
-    }
-
-    .modal-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-family: var(--font-mono);
-      font-size: 0.68rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--pink);
-      border: 1px solid rgba(255,0,127,0.3);
-      background: rgba(255,0,127,0.07);
-      padding: 6px 14px;
-      border-radius: 100px;
-      margin-bottom: 20px;
-    }
-
-    .modal-title {
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: 1.6rem;
-      color: #fff;
-      margin-bottom: 20px;
-      line-height: 1.15;
-    }
-
-    .modal-body {
-      font-size: 0.9rem;
-      line-height: 1.75;
-      color: rgba(232,224,255,0.65);
-      margin-bottom: 32px;
-    }
-
-    .modal-body strong { color: var(--pink); font-weight: 700; }
-
-    .modal-close {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 13px 28px;
-      border-radius: 100px;
-      background: linear-gradient(135deg, var(--pink), var(--purple));
-      color: #fff;
+    .social-btn:hover { transform: scale(1.12); }
+    .social-btn.ig:hover { background: rgba(255,0,127,0.2); color: var(--pink); }
+    .social-btn.yt:hover { background: rgba(255,0,0,0.2); color: #ff4444; }
+    .social-btn.wa:hover { background: rgba(37,211,102,0.2); color: #25d366; }
+    .social-btn.tg:hover { background: rgba(0,136,204,0.2); color: #0088cc; }
+    .social-btn.tw:hover { background: rgba(29,161,242,0.15); color: #1da1f2; }
+    .footer-col-title {
       font-family: var(--font-display);
       font-weight: 700;
-      font-size: 0.88rem;
-      box-shadow: 0 0 28px rgba(255,0,127,0.35);
-      transition: transform 0.2s, box-shadow 0.2s;
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 1.2rem;
     }
-
-    .modal-close:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 44px rgba(255,0,127,0.55);
+    .footer-links { display: flex; flex-direction: column; gap: 0.8rem; }
+    .footer-links a {
+      font-size: 0.88rem;
+      color: rgba(200,210,255,0.5);
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--cyan); }
+    .footer-bottom {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      text-align: center;
+    }
+    .footer-copyright {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-family: var(--font-display);
+      font-weight: 600;
+    }
+    .footer-email {
+      display: block;
+      margin-top: 0.5rem;
+      font-size: 0.83rem;
+      color: var(--cyan);
+      transition: color 0.2s, text-shadow 0.2s;
+    }
+    .footer-email:hover {
+      color: var(--pink);
+      text-shadow: 0 0 20px rgba(255,0,127,0.5);
     }
 
     /* ============================================================
-       SCROLL REVEAL
+       TOAST NOTIFICATION
     ============================================================ */
-    .reveal {
+    #toast {
+      position: fixed; bottom: 2rem; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      z-index: 9999;
+      padding: 16px 32px;
+      border-radius: 50px;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: 0.05em;
+      color: #fff;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      box-shadow: 0 8px 40px rgba(112,0,255,0.5);
       opacity: 0;
-      transform: translateY(36px);
-      transition: opacity 0.7s cubic-bezier(0.23,1,0.32,1), transform 0.7s cubic-bezier(0.23,1,0.32,1);
+      transition: opacity 0.35s ease, transform 0.35s cubic-bezier(.22,.68,0,1.2);
+      pointer-events: none;
+      white-space: nowrap;
     }
-
-    .reveal.visible {
+    #toast.show {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateX(-50%) translateY(0);
     }
 
     /* ============================================================
        RESPONSIVE
     ============================================================ */
     @media (max-width: 900px) {
-      .stats-glass { grid-template-columns: 1fr; padding: 32px 24px; }
-      .stat-item:not(:last-child)::after { display: none; }
-      .nav-links { display: none; }
-      .apps-grid { grid-template-columns: 1fr; }
-      .ig-banner { flex-direction: column; text-align: center; }
-      .ig-banner-cta { margin-left: 0; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+      .footer-grid > :first-child { grid-column: 1 / -1; }
     }
-
-    @media (max-width: 600px) {
-      .hero-title { font-size: clamp(2.4rem, 12vw, 4rem); }
-      .hero-actions { flex-direction: column; }
-      .btn-primary, .btn-ghost { justify-content: center; }
-      .stats-glass { padding: 24px 16px; }
-      .modal-box { padding: 32px 24px; }
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .apps-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr; }
+      #toast { font-size: 0.85rem; padding: 14px 22px; max-width: 90vw; white-space: normal; text-align: center; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ========== BACKGROUND ========== -->
-  <div class="bg-canvas" aria-hidden="true">
+  <!-- Ambient Orbs -->
+  <div class="bg-orbs" aria-hidden="true">
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
     <div class="orb orb-3"></div>
   </div>
 
-  <!-- ========== NAV ========== -->
+  <!-- Toast Notification -->
+  <div id="toast">🚀 COMING SOON LAADLE</div>
+
+  <!-- Modal for Metrics -->
+  <div class="modal-overlay" id="metricsModal" role="dialog" aria-modal="true">
+    <div class="glass modal-box">
+      <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+      <div class="modal-title" id="modalAppName">App Metrics</div>
+      <div class="metrics-grid">
+        <div class="metric-item">
+          <div class="metric-val" id="m1">—</div>
+          <div class="metric-lbl">Uptime</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-val" id="m2">—</div>
+          <div class="metric-lbl">Avg Response</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-val" id="m3">—</div>
+          <div class="metric-lbl">Active Users</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-val" id="m4">—</div>
+          <div class="metric-lbl">Build Version</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== NAV ===================== -->
   <nav>
-    <div class="nav-inner">
-      <div class="nav-logo">ADIL.DEV</div>
-      <ul class="nav-links">
-        <li><a href="#apps">Apps</a></li>
-        <li><a href="#social">Contact</a></li>
-        <li><a href="#" onclick="openModal()" class="footer-links-item">Terms</a></li>
-      </ul>
-      <!-- ✏️ Replace href with your Instagram direct link -->
-      <a href="https://www.instagram.com/adil_bhai888?igsh=MXQ2NXg2dDBreHgwZQ==" target="_blank" class="nav-cta">Hire Me ↗</a>
+    <div class="nav-logo">ADIL.</div>
+    <div class="nav-links">
+      <a href="#stats">Stats</a>
+      <a href="#apps">Apps</a>
+      <a href="mailto:adilhussain899999@gmail.com">Contact</a>
+      <a class="nav-cta" href="https://www.instagram.com/adil_bhai888?igsh=MXQ2NXg2dDBreHgwZQ==" target="_blank" rel="noopener">
+        <i class="fa-brands fa-instagram"></i> &nbsp;DM Me
+      </a>
     </div>
   </nav>
 
-  <!-- ========== HERO ========== -->
-  <section class="hero">
-    <div class="wrapper">
-      <div class="hero-content">
-        <div class="hero-eyebrow">
-          <span class="dot"></span>
-          Available for Premium Projects
-        </div>
-        <h1 class="hero-title">
-          <span class="line-1">APPS</span>
-          <span class="line-2">DEVELOPER</span>
-          <span class="line-3">AND SCRAPING EXPERT</span>
-        </h1>
-        <p class="hero-sub">
-          Architecting high-performance custom applications, intelligent automation pipelines, and large-scale data extraction systems for elite global clients.
+  <!-- ===================== HERO ===================== -->
+  <section id="hero">
+    <div class="hero-eyebrow">
+      <span></span>
+      Available for Projects
+    </div>
+    <h1 class="hero-title">
+      <span class="line-cyan">Apps Developer</span>
+      <span class="line-pink">& Scrapping Expert</span>
+    </h1>
+    <p class="hero-subtitle">
+      Building high-performance applications and intelligent data pipelines for a global clientele. Precision-engineered. Production-grade. Zero compromise.
+    </p>
+    <div class="hero-actions">
+      <a href="https://www.instagram.com/adil_bhai888?igsh=MXQ2NXg2dDBreHgwZQ==" target="_blank" rel="noopener" class="btn-primary">
+        <i class="fa-brands fa-instagram"></i> &nbsp;Request Access via Instagram
+      </a>
+      <a href="#apps" class="btn-secondary">
+        View All Apps &nbsp;↓
+      </a>
+    </div>
+    <div class="scroll-hint">
+      <div class="arrow"></div>
+      Scroll to explore
+    </div>
+  </section>
+
+  <!-- ===================== STATS ===================== -->
+  <section id="stats">
+    <div class="stats-grid">
+      <div class="stat-card glass">
+        <div class="stat-icon"><i class="fa-solid fa-database"></i></div>
+        <div class="stat-number" data-target="500000" data-suffix="+" data-prefix="">0</div>
+        <div class="stat-label">Data Points Scraped</div>
+      </div>
+      <div class="stat-card glass">
+        <div class="stat-icon"><i class="fa-solid fa-rocket"></i></div>
+        <div class="stat-number" data-target="15" data-suffix="+" data-prefix="">0</div>
+        <div class="stat-label">High-Performance Apps Built</div>
+      </div>
+      <div class="stat-card glass">
+        <div class="stat-icon"><i class="fa-solid fa-bolt"></i></div>
+        <div class="stat-number" data-target="99.9" data-suffix="%" data-prefix="" data-decimal="true">0</div>
+        <div class="stat-label">Core Latency Optimization</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TECH MARQUEE ===================== -->
+  <section id="marquee">
+    <div class="marquee-label">Technologies & Expertise</div>
+    <div class="marquee-track-wrapper">
+      <div class="marquee-track" id="marqueeTrack">
+        <!-- Set A -->
+        <span class="marquee-item py"><i class="fa-brands fa-python"></i> Python</span>
+        <span class="marquee-dot">·</span>
+        <span class="marquee-item js"><i class="fa-brands fa-js"></i> JavaScript</span>
+        <span class="marquee-dot">·</span>
+        <span class="marquee-item css"><i class="fa-brands fa-css3-alt"></i> CSS3</span>
+        <span class="marquee-dot">·</span>
+        <span class="marquee-item html"><i class="fa-brands fa-html5"></i> HTML5</span>
+        <span class="marquee-dot">·</span>
+        <span class="marquee-item linux"><i class="fa-brands fa-linux"></i> Linux</span>
+        <span class="marquee-dot">·</span>
+        <span class="marquee-item api"><i class="fa-solid fa-plug"></i> API Integrations</span>
+        <span class="marquee-dot">·</span>
+        <span class="marquee-item py"><i class="fa-brands fa-python"></i> Web Scraping</span>
+        <span class="marquee-dot">·</span>
+        <span class="marquee-item js"><i class="fa-solid fa-brain"></i> AI / LLM</span>
+        <span class="marquee-dot">·</span>
+        <!-- Set B (clone for seamless loop) -->
+        <span class="marquee-item py"><i class="fa-brands fa-python"></i> Python</span>
+        <span class="marquee-dot">·</span>
+        <span class="marquee-item js"><i class="fa-brands fa-js"></i> JavaScript</span>
+        <span class="marquee-dot">·</span>
+        <span class="marquee-item css"><i class="fa-brands fa-css3-alt"></i> CSS3</span>
+        <span class="marquee-dot">·</span>
+        <span class="marquee-item html"><i class="fa-brands fa-html5"></i> HTML5</span>
+        <span class="marquee-dot">·</span>
+        <span class="marquee-item linux"><i class="fa-brands fa-linux"></i> Linux</span>
+        <span class="marquee-dot">·</span>
+        <span class="marquee-item api"><i class="fa-solid fa-plug"></i> API Integrations</span>
+        <span class="marquee-dot">·</span>
+        <span class="marquee-item py"><i class="fa-brands fa-python"></i> Web Scraping</span>
+        <span class="marquee-dot">·</span>
+        <span class="marquee-item js"><i class="fa-solid fa-brain"></i> AI / LLM</span>
+        <span class="marquee-dot">·</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== APPS GRID ===================== -->
+  <section id="apps">
+    <div class="section-header">
+      <div class="section-eyebrow">🚀 Production Applications</div>
+      <h2 class="section-title">App Showcase</h2>
+    </div>
+    <div class="apps-grid" id="appsGrid"></div>
+  </section>
+
+  <!-- ===================== INSTAGRAM NOTICE ===================== -->
+  <section id="ig-notice">
+    <div class="ig-banner glass">
+      <div class="ig-banner-title">
+        👉 <span>ATTENTION:</span> To gain access to any of these applications or to acquire the source code, please send a direct message (DM) on Instagram immediately.
+      </div>
+      <a href="https://www.instagram.com/adil_bhai888?igsh=MXQ2NXg2dDBreHgwZQ==" target="_blank" rel="noopener" class="ig-cta-btn">
+        <i class="fa-brands fa-instagram"></i> Open Instagram DM
+      </a>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+    <footer>
+    <div class="footer-grid">
+      <!-- Brand -->
+      <div>
+        <div class="footer-brand-name">ADIL.</div>
+        <p class="footer-brand-desc">
+          Elite apps developer and data scraping architect delivering production-grade software solutions to clients worldwide.
         </p>
-        <div class="hero-actions">
-          <a href="#apps" class="btn-primary">
-            <i class="fa-solid fa-grid-2"></i> Explore Apps
+        <div class="footer-social">
+          <!-- Instagram -->
+          <a class="social-btn ig" href="https://www.instagram.com/adil_bhai888?igsh=MXQ2NXg2dDBreHgwZQ==" target="_blank" rel="noopener" aria-label="Instagram">
+            <i class="fa-brands fa-instagram"></i>
           </a>
-          <!-- ✏️ Replace href with your WhatsApp chat link -->
-          <a href="COMING_SOON_LAADLE" target="_blank" class="btn-ghost">
-            <i class="fa-brands fa-whatsapp"></i> WhatsApp Me
+          <!-- YouTube — paste your YouTube link below inside href="" -->
+          <a class="social-btn yt" href="PASTE_YOUR_YOUTUBE_LINK_HERE" target="_blank" rel="noopener" aria-label="YouTube">
+            <i class="fa-brands fa-youtube"></i>
           </a>
+          <!-- WhatsApp: Coming Soon -->
+          <button class="social-btn wa coming-soon-btn" aria-label="WhatsApp">
+            <i class="fa-brands fa-whatsapp"></i>
+          </button>
+          <!-- Telegram: Coming Soon -->
+          <button class="social-btn tg coming-soon-btn" aria-label="Telegram">
+            <i class="fa-brands fa-telegram"></i>
+          </button>
+          <!-- Twitter/X: Coming Soon -->
+          <button class="social-btn tw coming-soon-btn" aria-label="Twitter/X">
+            <i class="fa-brands fa-x-twitter"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div>
+        <div class="footer-col-title">Quick Links</div>
+        <div class="footer-links">
+          <a href="#hero">Home</a>
+          <a href="#stats">Stats</a>
+          <a href="#apps">Applications</a>
+          <a href="https://www.instagram.com/adil_bhai888?igsh=MXQ2NXg2dDBreHgwZQ==" target="_blank" rel="noopener">Instagram DM</a>
+        </div>
+      </div>
+
+      <!-- Contact -->
+      <div>
+        <div class="footer-col-title">Contact</div>
+        <div class="footer-links">
+          <a href="mailto:adilhussain899999@gmail.com">adilhussain899999@gmail.com</a>
+          <a href="https://www.instagram.com/adil_bhai888?igsh=MXQ2NXg2dDBreHgwZQ==" target="_blank" rel="noopener">Instagram DMs Open</a>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- ========== STATS ========== -->
-  <section class="stats-section">
-    <div class="wrapper">
-      <div class="stats-glass glass reveal">
-        <div class="stat-item">
-          <div class="stat-number cyan" data-target="500000" data-suffix="+" data-prefix="">0</div>
-          <div class="stat-label">Data Points Scraped</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number pink" data-target="15" data-suffix="+" data-prefix="">0</div>
-          <div class="stat-label">High-Performance Apps Built</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number purple" data-target="99" data-suffix=".9%" data-prefix="">0</div>
-          <div class="stat-label">Core Latency Optimization</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ========== MARQUEE ========== -->
-  <section class="marquee-section">
-    <div class="marquee-label">Core Technology Stack</div>
-    <div class="marquee-track" aria-label="Technology stack">
-      <!-- Strip duplicated for seamless loop -->
-      <div class="marquee-strip">
-        <span class="tech-badge"><i class="fa-brands fa-python"></i> Python</span>
-        <span class="tech-badge"><i class="fa-brands fa-js"></i> JavaScript</span>
-        <span class="tech-badge"><i class="fa-brands fa-css3-alt"></i> CSS3</span>
-        <span class="tech-badge"><i class="fa-brands fa-html5"></i> HTML5</span>
-        <span class="tech-badge"><i class="fa-brands fa-linux"></i> Linux</span>
-        <span class="tech-badge"><i class="fa-solid fa-plug"></i> API Integrations</span>
-        <span class="tech-badge"><i class="fa-solid fa-database"></i> Data Engineering</span>
-        <span class="tech-badge"><i class="fa-solid fa-robot"></i> AI / LLM</span>
-        <span class="tech-badge"><i class="fa-brands fa-python"></i> Python</span>
-        <span class="tech-badge"><i class="fa-brands fa-js"></i> JavaScript</span>
-        <span class="tech-badge"><i class="fa-brands fa-css3-alt"></i> CSS3</span>
-        <span class="tech-badge"><i class="fa-brands fa-html5"></i> HTML5</span>
-        <span class="tech-badge"><i class="fa-brands fa-linux"></i> Linux</span>
-        <span class="tech-badge"><i class="fa-solid fa-plug"></i> API Integrations</span>
-        <span class="tech-badge"><i class="fa-solid fa-database"></i> Data Engineering</span>
-        <span class="tech-badge"><i class="fa-solid fa-robot"></i> AI / LLM</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ========== APPS GRID ========== -->
-  <section class="apps-section" id="apps">
-    <div class="wrapper">
-      <div class="section-head reveal">
-        <div class="section-eyebrow">Production Applications</div>
-        <h2 class="section-title">The Full Arsenal</h2>
-        <p class="section-sub">Every application is engineered from scratch — zero templates, maximum performance.</p>
-      </div>
-
-      <div class="apps-grid">
-
-        <!-- ADILNextAi -->
-        <div class="app-card glass reveal">
-          <div class="app-icon-row">
-            <span class="app-emoji">📱</span>
-            <div class="app-tech-icons">
-              <i class="fa-brands fa-python" title="Python"></i>
-              <i class="fa-solid fa-robot" title="AI"></i>
-              <i class="fa-solid fa-microchip" title="LLM"></i>
-            </div>
-          </div>
-          <div class="app-name">ADILNextAi</div>
-          <p class="app-desc">High-capacity neural core engine deploying custom local LLM frameworks with real-time streaming tokens and sub-100ms processing architectures.</p>
-          <div class="app-actions">
-            <button class="btn-metrics" onclick="showMetrics('ADILNextAi')">View Metrics</button>
-            <!-- ✏️ Replace with your Instagram link (request access pre-fill) -->
-            <a href="https://www.instagram.com/adil_bhai888?igsh=MXQ2NXg2dDBreHgwZQ==?text=Hello%20Adil%2C%20I%20would%20like%20to%20request%20access%20to%20ADILNextAi" target="_blank" class="btn-access">Request Access</a>
-          </div>
-        </div>
-
-        <!-- ADILXSUFIA -->
-        <div class="app-card glass reveal">
-          <div class="app-icon-row">
-            <span class="app-emoji">💬</span>
-            <div class="app-tech-icons">
-              <i class="fa-solid fa-brain" title="AI"></i>
-              <i class="fa-brands fa-python" title="Python"></i>
-              <i class="fa-solid fa-comments" title="Chat"></i>
-            </div>
-          </div>
-          <div class="app-name">ADILXSUFIA</div>
-          <p class="app-desc">Advanced cognitive AI ecosystem implementing multi-agent memory matrices and empathetic communication algorithms for next-level conversational intelligence.</p>
-          <div class="app-actions">
-            <button class="btn-metrics" onclick="showMetrics('ADILXSUFIA')">View Metrics</button>
-            <a href="https://www.instagram.com/adil_bhai888?igsh=MXQ2NXg2dDBreHgwZQ==?text=Hello%20Adil%2C%20I%20would%20like%20to%20request%20access%20to%20ADILXSUFIA" target="_blank" class="btn-access">Request Access</a>
-          </div>
-        </div>
-
-        <!-- ADILSELFTYPTST -->
-        <div class="app-card glass reveal">
-          <div class="app-icon-row">
-            <span class="app-emoji">⚡</span>
-            <div class="app-tech-icons">
-              <i class="fa-brands fa-js" title="JavaScript"></i>
-              <i class="fa-brands fa-html5" title="HTML5"></i>
-              <i class="fa-solid fa-keyboard" title="Keyboard"></i>
-            </div>
-          </div>
-          <div class="app-name">ADILSELFTYPTST</div>
-          <p class="app-desc">Ultra-smooth web-based mechanical key emulation and typing diagnostics suite featuring live speed analytics, real-time WPM tracking, and precision accuracy metrics.</p>
-          <div class="app-actions">
-            <button class="btn-metrics" onclick="showMetrics('ADILSELFTYPTST')">View Metrics</button>
-            <a href="PASTE_YOUR_INSTAGRAM_LINK_HERE?text=Hello%20Adil%2C%20I%20would%20like%20to%20request%20access%20to%20ADILSELFTYPTST" target="_blank" class="btn-access">Request Access</a>
-          </div>
-        </div>
-
-        <!-- WEATHER APPS -->
-        <div class="app-card glass reveal">
-          <div class="app-icon-row">
-            <span class="app-emoji">☀️</span>
-            <div class="app-tech-icons">
-              <i class="fa-brands fa-python" title="Python"></i>
-              <i class="fa-solid fa-plug" title="API"></i>
-              <i class="fa-solid fa-cloud" title="Weather"></i>
-            </div>
-          </div>
-          <div class="app-name">ADIL WEATHER SUITE</div>
-          <p class="app-desc">Comprehensive atmospheric tracking applications — ADIL_WEATHER_REPORT & ADILWEATHER2 — providing real-time data visualization and localized weather streams via live APIs.</p>
-          <div class="app-actions">
-            <button class="btn-metrics" onclick="showMetrics('ADIL Weather Suite')">View Metrics</button>
-            <a href="PASTE_YOUR_INSTAGRAM_LINK_HERE?text=Hello%20Adil%2C%20I%20would%20like%20to%20request%20access%20to%20ADIL_WEATHER_REPORT" target="_blank" class="btn-access">Request Access</a>
-          </div>
-        </div>
-
-        <!-- SECRET AI / VAULT -->
-        <div class="app-card glass reveal">
-          <div class="app-icon-row">
-            <span class="app-emoji">🔐</span>
-            <div class="app-tech-icons">
-              <i class="fa-solid fa-lock" title="Encryption"></i>
-              <i class="fa-brands fa-python" title="Python"></i>
-              <i class="fa-solid fa-shield-halved" title="Security"></i>
-            </div>
-          </div>
-          <div class="app-name">ADILSECRETAI & VAULT</div>
-          <p class="app-desc">Premium security architectures — ADILSECRETAI & AADILSECRETVAULT — featuring encrypted operational relays, secure multi-tier authentication, and zero-knowledge storage patterns.</p>
-          <div class="app-actions">
-            <button class="btn-metrics" onclick="showMetrics('ADILSECRETAI')">View Metrics</button>
-            <a href="PASTE_YOUR_INSTAGRAM_LINK_HERE?text=Hello%20Adil%2C%20I%20would%20like%20to%20request%20access%20to%20ADILSECRETAI" target="_blank" class="btn-access">Request Access</a>
-          </div>
-        </div>
-
-        <!-- IMAGE DETECTIVE -->
-        <div class="app-card glass reveal">
-          <div class="app-icon-row">
-            <span class="app-emoji">🔍</span>
-            <div class="app-tech-icons">
-              <i class="fa-solid fa-eye" title="Vision"></i>
-              <i class="fa-brands fa-python" title="Python"></i>
-              <i class="fa-solid fa-image" title="Image"></i>
-            </div>
-          </div>
-          <div class="app-name">ADIL IMAGE DETECTIVE</div>
-          <p class="app-desc">Intelligent computer-vision analysis framework running specialized pattern recognition logic with deep feature extraction and real-time classification pipelines.</p>
-          <div class="app-actions">
-            <button class="btn-metrics" onclick="showMetrics('ADIL_IMAGE_DETECTIVE')">View Metrics</button>
-            <a href="PASTE_YOUR_INSTAGRAM_LINK_HERE?text=Hello%20Adil%2C%20I%20would%20like%20to%20request%20access%20to%20ADIL_IMAGE_DETECTIVE" target="_blank" class="btn-access">Request Access</a>
-          </div>
-        </div>
-
-        <!-- CAR GAMES -->
-        <div class="app-card glass reveal">
-          <div class="app-icon-row">
-            <span class="app-emoji">🚗</span>
-            <div class="app-tech-icons">
-              <i class="fa-brands fa-js" title="JavaScript"></i>
-              <i class="fa-solid fa-gauge-high" title="Physics"></i>
-              <i class="fa-solid fa-gamepad" title="Game"></i>
-            </div>
-          </div>
-          <div class="app-name">ADILXCARGAME & ULTRA CAR</div>
-          <p class="app-desc">Dynamic interactive simulation engines — ADILXCARGAME & ADIL ULTRA CAR — engineered with fluid motion analytics, physics telemetry, and 60fps rendering optimization.</p>
-          <div class="app-actions">
-            <button class="btn-metrics" onclick="showMetrics('ADILXCARGAME')">View Metrics</button>
-            <a href="PASTE_YOUR_INSTAGRAM_LINK_HERE?text=Hello%20Adil%2C%20I%20would%20like%20to%20request%20access%20to%20ADILXCARGAME" target="_blank" class="btn-access">Request Access</a>
-          </div>
-        </div>
-
-        <!-- AGE CALCULATOR -->
-        <div class="app-card glass reveal">
-          <div class="app-icon-row">
-            <span class="app-emoji">🧮</span>
-            <div class="app-tech-icons">
-              <i class="fa-brands fa-js" title="JavaScript"></i>
-              <i class="fa-brands fa-html5" title="HTML5"></i>
-              <i class="fa-solid fa-clock" title="Time"></i>
-            </div>
-          </div>
-          <div class="app-name">ADIL-AGE-CALCULATOR</div>
-          <p class="app-desc">Precision duration tool executing microsecond telemetry for accurate real-time time-delta evaluation. Clean, blazing-fast interface with millisecond-level accuracy.</p>
-          <div class="app-actions">
-            <button class="btn-metrics" onclick="showMetrics('ADIL-AGE-CALCULATOR')">View Metrics</button>
-            <a href="PASTE_YOUR_INSTAGRAM_LINK_HERE?text=Hello%20Adil%2C%20I%20would%20like%20to%20request%20access%20to%20ADIL-AGE-CALCULATOR" target="_blank" class="btn-access">Request Access</a>
-          </div>
-        </div>
-
-        <!-- NOTES -->
-        <div class="app-card glass reveal">
-          <div class="app-icon-row">
-            <span class="app-emoji">📝</span>
-            <div class="app-tech-icons">
-              <i class="fa-brands fa-js" title="JavaScript"></i>
-              <i class="fa-solid fa-database" title="Storage"></i>
-              <i class="fa-solid fa-note-sticky" title="Notes"></i>
-            </div>
-          </div>
-          <div class="app-name">ADILNOTES143</div>
-          <p class="app-desc">Streamlined database structure for rapid local cross-platform note storage and instant text indexing with offline-first architecture and sync capabilities.</p>
-          <div class="app-actions">
-            <button class="btn-metrics" onclick="showMetrics('ADILNOTES143')">View Metrics</button>
-            <a href="PASTE_YOUR_INSTAGRAM_LINK_HERE?text=Hello%20Adil%2C%20I%20would%20like%20to%20request%20access%20to%20ADILNOTES143" target="_blank" class="btn-access">Request Access</a>
-          </div>
-        </div>
-
-        <!-- WHATSAPP ADVANCED -->
-        <div class="app-card glass reveal">
-          <div class="app-icon-row">
-            <span class="app-emoji">💬</span>
-            <div class="app-tech-icons">
-              <i class="fa-brands fa-whatsapp" title="WhatsApp"></i>
-              <i class="fa-brands fa-python" title="Python"></i>
-              <i class="fa-solid fa-webhook" title="Webhook"></i>
-            </div>
-          </div>
-          <div class="app-name">WHATSAPP ADVANCED SUITE</div>
-          <p class="app-desc">Advanced messaging automation layers — WHATSAPP_ADVANCED & ADMIN_WHATSAPP — integrating secure webhook triggers, automated relay systems, and communication control panels.</p>
-          <div class="app-actions">
-            <button class="btn-metrics" onclick="showMetrics('WHATSAPP_ADVANCED')">View Metrics</button>
-            <a href="PASTE_YOUR_INSTAGRAM_LINK_HERE?text=Hello%20Adil%2C%20I%20would%20like%20to%20request%20access%20to%20WHATSAPP_ADVANCED" target="_blank" class="btn-access">Request Access</a>
-          </div>
-        </div>
-
-        <!-- CYBER / HACKING HUB -->
-        <div class="app-card glass reveal">
-          <div class="app-icon-row">
-            <span class="app-emoji">🛡️</span>
-            <div class="app-tech-icons">
-              <i class="fa-solid fa-shield-halved" title="Security"></i>
-              <i class="fa-brands fa-linux" title="Linux"></i>
-              <i class="fa-solid fa-terminal" title="Terminal"></i>
-            </div>
-          </div>
-          <div class="app-name">ADILCYBER X & HACKING HUB</div>
-          <p class="app-desc">High-level digital security assessment sandboxes — ADILCYBER X & ADILHACKINGHUB — executing local network diagnostics and penetration testing simulations in isolated environments.</p>
-          <div class="app-actions">
-            <button class="btn-metrics" onclick="showMetrics('ADILCYBER X')">View Metrics</button>
-            <a href="PASTE_YOUR_INSTAGRAM_LINK_HERE?text=Hello%20Adil%2C%20I%20would%20like%20to%20request%20access%20to%20ADILCYBER_X" target="_blank" class="btn-access">Request Access</a>
-          </div>
-        </div>
-
-      </div><!-- /apps-grid -->
-    </div>
-  </section>
-
-  <!-- ========== INSTAGRAM DM BANNER ========== -->
-  <div class="wrapper">
-    <!-- ✏️ Replace href with your Instagram direct link -->
-    <a href="PASTE_YOUR_INSTAGRAM_LINK_HERE" target="_blank" class="ig-banner glass reveal" style="display:flex;">
-      <div class="ig-banner-icon"><i class="fa-brands fa-instagram"></i></div>
-      <div class="ig-banner-text">
-        <h3>👉 ATTENTION</h3>
-        <p>To gain access to any of these applications or to acquire the source code, please send a direct message (DM) on Instagram immediately.</p>
-      </div>
-      <span class="ig-banner-cta">
-        <i class="fa-brands fa-instagram"></i> DM on Instagram
-      </span>
-    </a>
-  </div>
-
-  <!-- ========== SOCIAL SECTION ========== -->
-  <section class="social-section" id="social">
-    <div class="wrapper">
-      <div class="section-head reveal">
-        <div class="section-eyebrow">Get in Touch</div>
-        <h2 class="section-title">Connect Directly</h2>
-        <p class="section-sub">Reach out on your preferred platform. Response guaranteed within 24 hours.</p>
-      </div>
-
-      <div class="social-grid">
-        <!-- ✏️ Replace all href values with your actual links -->
-        <a href="COMING_SOON_LAALA" target="_blank" class="social-card glass whatsapp">
-          <i class="fa-brands fa-whatsapp"></i> WhatsApp
-        </a>
-        <a href="https://www.instagram.com/adil_bhai888?igsh=MXQ2NXg2dDBreHgwZQ==" target="_blank" class="social-card glass instagram">
-          <i class="fa-brands fa-instagram"></i> Instagram
-        </a>
-        <a href="COMING_SOON_LAALA" target="_blank" class="social-card glass telegram">
-          <i class="fa-brands fa-telegram"></i> Telegram
-        </a>
-        <a href="https://youtube.com/@adilislive-1?si=GxQRlWLvu_zJwbT1" target="_blank" class="social-card glass youtube">
-          <i class="fa-brands fa-youtube"></i> YouTube
-        </a>
-        <a href="COMING_SOON_LAALA" target="_blank" class="social-card glass twitter">
-          <i class="fa-brands fa-x-twitter"></i> Twitter / X
-        </a>
-        <a href="mailto:adilhussain899999@gmail.com" class="social-card glass email">
-          <i class="fa-solid fa-envelope"></i> Email
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ========== FOOTER ========== -->
-  <footer>
-    <div class="wrapper">
-      <div class="footer-logo">ADIL.DEV</div>
-      <div class="footer-sub">Apps Developer &amp; Scraping Expert — Global</div>
-      <div class="footer-links">
-        <a href="#apps">Apps</a>
-        <a href="#social">Contact</a>
-        <a href="mailto:adilhussain899999@gmail.com">adilhussain899999@gmail.com</a>
-        <a href="#" onclick="openModal(); return false;">Terms &amp; Conditions</a>
-      </div>
-      <div class="footer-copy">&copy; 2025 Adil. All rights reserved. Unauthorized reproduction strictly prohibited.</div>
+    <!-- Copyright Block — DO NOT MODIFY STRUCTURE -->
+    <div class="footer-bottom">
+      <div class="footer-copyright">© 2026 Adil. All Rights Reserved.</div>
+      <a class="footer-email" href="mailto:adilhussain899999@gmail.com">adilhussain899999@gmail.com</a>
     </div>
   </footer>
 
-  <!-- ========== TERMS MODAL ========== -->
-  <div class="modal-overlay" id="termsModal" onclick="closeModal(event)">
-    <div class="modal-box glass">
-      <div class="modal-badge"><i class="fa-solid fa-triangle-exclamation"></i> Legal Notice</div>
-      <h2 class="modal-title">Anti-Piracy Warning</h2>
-      <p class="modal-body">
-        <strong>WARNING & ANTI-PIRACY NOTICE:</strong> All applications, source codes, visual assets, and layouts on this platform are the exclusive intellectual property of Adil. Any unauthorized copying, distribution, or reverse-engineering of my code is <strong>strictly prohibited</strong>. Violators will face immediate, merciless <strong>DMCA copyright takedown strikes</strong> and full legal enforcement. Do not touch my code without explicit written authorization.
-      </p>
-      <button class="modal-close" onclick="closeModal()">
-        <i class="fa-solid fa-xmark"></i> I Understand
-      </button>
-    </div>
-  </div>
-
-  <!-- ========== JAVASCRIPT ========== -->
+  <!-- ===================== JAVASCRIPT ===================== -->
   <script>
-    /* ----------------------------------------------------------
-       SCROLL REVEAL
-    ---------------------------------------------------------- */
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          revealObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.12 });
+    /* ============================================================
+       APP DATA
+    ============================================================ */
+    const IG_BASE = 'https://www.instagram.com/adil_bhai888?igsh=MXQ2NXg2dDBreHgwZQ==';
 
-    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+    const apps = [
+      {
+        emoji: '📱',
+        name: 'ADILNextAi',
+        desc: 'High-capacity neural core engine deploying custom local LLM frameworks with real-time streaming tokens and sub-100ms processing architectures.',
+        icons: ['fa-brands fa-python', 'fa-solid fa-brain', 'fa-solid fa-microchip'],
+        accessMsg: 'Hi Adil, I want to request access to ADILNextAi — please share the app parameters or source code.',
+        metrics: ['99.8%', '<80ms', '1.2K+', 'v3.1.0'],
+      },
+      {
+        emoji: '💬',
+        name: 'ADILXSUFIA',
+        desc: 'Advanced cognitive AI ecosystem implementing multi-agent memory matrices and empathetic communication algorithms.',
+        icons: ['fa-brands fa-python', 'fa-solid fa-comments', 'fa-solid fa-network-wired'],
+        accessMsg: 'Hi Adil, I want to request access to ADILXSUFIA — please share the app parameters or source code.',
+        metrics: ['99.5%', '<120ms', '800+', 'v2.4.1'],
+      },
+      {
+        emoji: '⚡',
+        name: 'ADILSELFTYPTST',
+        desc: 'Ultra-smooth web-based mechanical key emulation and typing diagnostics suite featuring live speed analytics.',
+        icons: ['fa-brands fa-js', 'fa-brands fa-html5', 'fa-brands fa-css3-alt'],
+        accessMsg: 'Hi Adil, I want to request access to ADILSELFTYPTST — please share the app parameters or source code.',
+        metrics: ['100%', '<5ms', '3.4K+', 'v1.9.7'],
+      },
+      {
+        emoji: '☀️',
+        name: 'ADIL_WEATHER_REPORT & ADILWEATHER2',
+        desc: 'Comprehensive atmospheric tracking applications providing real-time data visualization and localized weather streams.',
+        icons: ['fa-brands fa-python', 'fa-solid fa-cloud-sun', 'fa-solid fa-plug'],
+        accessMsg: 'Hi Adil, I want to request access to ADIL_WEATHER_REPORT & ADILWEATHER2 — please share the app parameters or source code.',
+        metrics: ['99.7%', '<200ms', '2.1K+', 'v2.0.3'],
+      },
+      {
+        emoji: '🔐',
+        name: 'ADILSECRETAI & AADILSECRETVAULT',
+        desc: 'Premium security architectures featuring encrypted operational relays and secure multi-tier authentication.',
+        icons: ['fa-solid fa-lock', 'fa-brands fa-python', 'fa-solid fa-shield-halved'],
+        accessMsg: 'Hi Adil, I want to request access to ADILSECRETAI & AADILSECRETVAULT — please share the app parameters or source code.',
+        metrics: ['99.9%', '<50ms', '650+', 'v4.0.1'],
+      },
+      {
+        emoji: '🔍',
+        name: 'ADIL_IMAGE_DETECTIVE',
+        desc: 'Intelligent computer-vision analysis framework running specialized pattern recognition logic.',
+        icons: ['fa-brands fa-python', 'fa-solid fa-eye', 'fa-solid fa-magnifying-glass'],
+        accessMsg: 'Hi Adil, I want to request access to ADIL_IMAGE_DETECTIVE — please share the app parameters or source code.',
+        metrics: ['98.2%', '<300ms', '420+', 'v1.5.2'],
+      },
+      {
+        emoji: '🚗',
+        name: 'ADILXCARGAME & ADIL ULTRA CAR',
+        desc: 'Dynamic interactive simulation engines engineered with fluid motion analytics and physics telemetry.',
+        icons: ['fa-brands fa-js', 'fa-brands fa-html5', 'fa-solid fa-gauge-high'],
+        accessMsg: 'Hi Adil, I want to request access to ADILXCARGAME & ADIL ULTRA CAR — please share the app parameters or source code.',
+        metrics: ['100%', '<16ms', '1.8K+', 'v2.2.0'],
+      },
+      {
+        emoji: '🧮',
+        name: 'ADIL-AGE-CALCULATOR',
+        desc: 'Precision duration tool executing micro-second telemetry for accurate real-time time-delta evaluation.',
+        icons: ['fa-brands fa-js', 'fa-solid fa-calendar-days', 'fa-solid fa-clock'],
+        accessMsg: 'Hi Adil, I want to request access to ADIL-AGE-CALCULATOR — please share the app parameters or source code.',
+        metrics: ['100%', '<2ms', '5.0K+', 'v1.1.4'],
+      },
+      {
+        emoji: '📝',
+        name: 'ADILNOTES143',
+        desc: 'Streamlined database structure for rapid local cross-platform note storage and instant text indexing.',
+        icons: ['fa-brands fa-js', 'fa-solid fa-database', 'fa-solid fa-note-sticky'],
+        accessMsg: 'Hi Adil, I want to request access to ADILNOTES143 — please share the app parameters or source code.',
+        metrics: ['99.9%', '<10ms', '2.7K+', 'v1.8.0'],
+      },
+      {
+        emoji: '💬',
+        name: 'WHATSAPP_ADVANCED & ADMIN_WHATSAPP',
+        desc: 'Advanced messaging automation layers integrating secure webhook triggers and communication relays.',
+        icons: ['fa-brands fa-whatsapp', 'fa-brands fa-python', 'fa-solid fa-webhook'],
+        accessMsg: 'Hi Adil, I want to request access to WHATSAPP_ADVANCED & ADMIN_WHATSAPP — please share the app parameters or source code.',
+        metrics: ['99.6%', '<90ms', '900+', 'v3.3.2'],
+      },
+      {
+        emoji: '🛡️',
+        name: 'ADILCYBER X & ADILHACKINGHUB',
+        desc: 'High-level digital security assessment sandboxes executing local network diagnostics and penetration testing simulations.',
+        icons: ['fa-solid fa-shield-virus', 'fa-brands fa-python', 'fa-solid fa-terminal'],
+        accessMsg: 'Hi Adil, I want to request access to ADILCYBER X & ADILHACKINGHUB — please share the app parameters or source code.',
+        metrics: ['99.4%', '<150ms', '310+', 'v2.6.1'],
+      },
+    ];
 
-    /* ----------------------------------------------------------
-       COUNTER ANIMATION
-    ---------------------------------------------------------- */
-    function animateCounter(el) {
-      const target = parseInt(el.dataset.target, 10);
-      const suffix = el.dataset.suffix || '';
-      const duration = 2000;
-      const start = performance.now();
+    const metricLabels = ['Uptime', 'Avg Response', 'Active Users', 'Build Version'];
 
-      function update(now) {
-        const elapsed = now - start;
-        const progress = Math.min(elapsed / duration, 1);
-        // Ease-out expo
-        const eased = 1 - Math.pow(2, -10 * progress);
-        const current = Math.round(eased * target);
-
-        // Format large numbers
-        el.textContent = current >= 1000
-          ? current.toLocaleString() + suffix
-          : current + suffix;
-
-        if (progress < 1) requestAnimationFrame(update);
-      }
-
-      requestAnimationFrame(update);
-    }
-
-    const counterObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          animateCounter(entry.target);
-          counterObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.5 });
-
-    document.querySelectorAll('.stat-number[data-target]').forEach(el => counterObserver.observe(el));
-
-    /* ----------------------------------------------------------
-       TERMS MODAL
-    ---------------------------------------------------------- */
-    function openModal() {
-      document.getElementById('termsModal').classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeModal(e) {
-      // Close if clicking overlay or button
-      if (!e || e.target === document.getElementById('termsModal') || e.currentTarget.classList.contains('modal-close')) {
-        document.getElementById('termsModal').classList.remove('open');
-        document.body.style.overflow = '';
-      }
-    }
-
-    document.querySelector('.modal-close').addEventListener('click', () => {
-      document.getElementById('termsModal').classList.remove('open');
-      document.body.style.overflow = '';
-    });
-
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') {
-        document.getElementById('termsModal').classList.remove('open');
-        document.body.style.overflow = '';
-      }
-    });
-
-    /* ----------------------------------------------------------
-       VIEW METRICS (micro toast)
-    ---------------------------------------------------------- */
-    function showMetrics(appName) {
-      // Remove existing toast
-      const existing = document.getElementById('metrics-toast');
-      if (existing) existing.remove();
-
-      const toast = document.createElement('div');
-      toast.id = 'metrics-toast';
-      toast.style.cssText = `
-        position: fixed;
-        bottom: 32px; left: 50%;
-        transform: translateX(-50%) translateY(20px);
-        background: rgba(10,2,30,0.92);
-        backdrop-filter: blur(20px);
-        border: 1px solid rgba(0,243,255,0.3);
-        border-radius: 100px;
-        padding: 14px 28px;
-        font-family: 'Space Mono', monospace;
-        font-size: 0.8rem;
-        color: #00f3ff;
-        letter-spacing: 0.06em;
-        z-index: 300;
-        white-space: nowrap;
-        box-shadow: 0 0 40px rgba(0,243,255,0.2);
-        transition: opacity 0.3s, transform 0.3s;
-        opacity: 0;
-      `;
-      toast.innerHTML = `<i class="fa-solid fa-chart-line" style="margin-right:10px;"></i>${appName} — Performance metrics available via DM on Instagram`;
-      document.body.appendChild(toast);
-
-      requestAnimationFrame(() => {
-        toast.style.opacity = '1';
-        toast.style.transform = 'translateX(-50%) translateY(0)';
-      });
-
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(-50%) translateY(10px)';
-        setTimeout(() => toast.remove(), 400);
-      }, 3500);
-    }
-
-    /* ----------------------------------------------------------
-       CARD TILT EFFECT (mild 3D on mouse move)
-    ---------------------------------------------------------- */
-    document.querySelectorAll('.app-card').forEach(card => {
-      card.addEventListener('mousemove', e => {
-        const rect = card.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width - 0.5;
-        const y = (e.clientY - rect.top) / rect.height - 0.5;
-        card.style.transform = `
-          translateY(-6px)
-          scale(1.012)
-          rotateX(${(-y * 6).toFixed(2)}deg)
-          rotateY(${(x * 6).toFixed(2)}deg)
+    /* ============================================================
+       RENDER APP CARDS
+    ============================================================ */
+    function buildCards() {
+      const grid = document.getElementById('appsGrid');
+      apps.forEach((app, idx) => {
+        const igLink = `${IG_BASE}&text=${encodeURIComponent(app.accessMsg)}`;
+        const card = document.createElement('div');
+        card.className = 'app-card glass';
+        card.innerHTML = `
+          <div class="app-card-header">
+            <div class="app-emoji">${app.emoji}</div>
+            <div class="app-tech-badges">
+              ${app.icons.map(ic => `<div class="tech-badge"><i class="${ic}"></i></div>`).join('')}
+            </div>
+          </div>
+          <div class="app-name">${app.name}</div>
+          <div class="app-desc">${app.desc}</div>
+          <div class="app-glow-bar"></div>
+          <div class="app-actions">
+            <button class="app-btn app-btn-metrics" data-idx="${idx}">📊 View Metrics</button>
+            <a class="app-btn app-btn-access" href="${igLink}" target="_blank" rel="noopener">🔓 Request Access</a>
+          </div>
         `;
+        grid.appendChild(card);
       });
 
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = '';
+      // Metrics button handlers
+      document.querySelectorAll('.app-btn-metrics').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.dataset.idx);
+          const app = apps[idx];
+          document.getElementById('modalAppName').textContent = app.emoji + ' ' + app.name + ' — Metrics';
+          ['m1','m2','m3','m4'].forEach((id, i) => {
+            document.getElementById(id).textContent = app.metrics[i];
+          });
+          document.getElementById('metricsModal').classList.add('active');
+        });
       });
+    }
+
+    /* ============================================================
+       MODAL CLOSE
+    ============================================================ */
+    document.getElementById('modalClose').addEventListener('click', () => {
+      document.getElementById('metricsModal').classList.remove('active');
     });
+    document.getElementById('metricsModal').addEventListener('click', function(e) {
+      if (e.target === this) this.classList.remove('active');
+    });
+
+    /* ============================================================
+       TOAST — COMING SOON LAADLE
+    ============================================================ */
+    function showToast() {
+      const t = document.getElementById('toast');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    document.querySelectorAll('.coming-soon-btn').forEach(btn => {
+      btn.addEventListener('click', showToast);
+    });
+
+    /* ============================================================
+       ANIMATED STATS COUNTER
+    ============================================================ */
+    function animateCounters() {
+      const counters = document.querySelectorAll('.stat-number[data-target]');
+      counters.forEach(el => {
+        const target = parseFloat(el.dataset.target);
+        const isDecimal = el.dataset.decimal === 'true';
+        const suffix = el.dataset.suffix || '';
+        const duration = 2200;
+        const start = performance.now();
+
+        function tick(now) {
+          const elapsed = now - start;
+          const progress = Math.min(elapsed / duration, 1);
+          // Ease out quint
+          const ease = 1 - Math.pow(1 - progress, 5);
+          const val = target * ease;
+
+          if (target >= 1000) {
+            el.textContent = Math.floor(val).toLocaleString() + suffix;
+          } else if (isDecimal) {
+            el.textContent = val.toFixed(1) + suffix;
+          } else {
+            el.textContent = Math.floor(val) + suffix;
+          }
+
+          if (progress < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      });
+    }
+
+    /* ============================================================
+       INTERSECTION OBSERVER — trigger counters on scroll
+    ============================================================ */
+    const statsSection = document.getElementById('stats');
+    let countersRun = false;
+    const statsObs = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !countersRun) {
+        countersRun = true;
+        animateCounters();
+      }
+    }, { threshold: 0.3 });
+    statsObs.observe(statsSection);
+
+    /* ============================================================
+       CARD ENTRANCE ANIMATIONS (IntersectionObserver)
+    ============================================================ */
+    function setupCardAnimations() {
+      const cards = document.querySelectorAll('.app-card, .stat-card');
+      cards.forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translate3d(0, 40px, 0)';
+        card.style.transition = 'opacity 0.6s ease, transform 0.6s cubic-bezier(.22,.68,0,1.2)';
+        card.style.willChange = 'transform, opacity';
+      });
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translate3d(0, 0, 0)';
+            obs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      cards.forEach(card => obs.observe(card));
+    }
+
+    /* ============================================================
+       INIT
+    ============================================================ */
+    buildCards();
+    setTimeout(() => {
+      setupCardAnimations();
+      // Re-attach coming-soon after buildCards adds new DOM
+      document.querySelectorAll('.coming-soon-btn').forEach(btn => {
+        btn.addEventListener('click', showToast);
+      });
+    }, 50);
   </script>
 </body>
-</html>
+</html>q
